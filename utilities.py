@@ -5,6 +5,10 @@ def read_data(file):
     df = pd.read_csv(file)
     return df
 
+def read_data_xls(file):
+    df = pd.read_excel(file)
+    return df
+
 def clasificar(simbolo):
     if simbolo in ['BBAR', 'BMA', 'VALO', 'SUPV', 'GGAL']:
         return 'BANCOS'
