@@ -2,7 +2,8 @@ import pandas as pd
 import numpy as np
 
 def read_data(file):
-    df = pd.read_csv(file)
+    filas = 365
+    df = pd.read_csv(file, skiprows=lambda x: x != 0 and x < (filas*-1))
     return df
 
 def read_data_xls(file):
@@ -53,8 +54,8 @@ def norma_key(df, clave, rango=0):
     v_min = np.min(df[clave])
     v_max = np.max(df[clave])
 
-    df[clave + '_N'] = (((df[clave] - v_min) * (rango+1)) / (v_max - v_min))-rango # Normalización por rango
-    #df[clave + '_N'] = ((df[clave] - df[clave].mean()) / df[clave].std()).round(2)  # Normalización por z-score o Gaussian normalization
+    #df[clave + '_N'] = (((df[clave] - v_min) * (rango+1)) / (v_max - v_min))-rango # Normalización por rango
+    df[clave + '_N'] = ((df[clave] - df[clave].mean()) / df[clave].std()).round(2)  # Normalización por z-score o Gaussian normalization
     return df
 
 
