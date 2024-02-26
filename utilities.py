@@ -25,7 +25,6 @@ def load_especie(especie):
             if body:
                 df = pd.DataFrame(body)
                 df = convertir_rava(df)
-                df = df.sort_values(by=['FECHA'])
             else:
                 print("Error: No se encuentra el body del archivo.")
         print("Archivo descargado exitosamente.")
@@ -33,17 +32,21 @@ def load_especie(especie):
         print("Error al descargar el archivo:", response.status_code)
     return df
 
+def recortar(df, dias):
+#    df = df.set_index('FECHA')
+    df = df.sort_values(by=['FECHA'])
+#    df = df.tail(dias)
+#    df = df.reset_index()
+    df = df.iloc[-dias:]
+    df = normalizar(df)
+
+
+    return df
 
 def read_data(file):
     filas = 365
     df = pd.read_csv(file, skiprows=lambda x: x != 0 and x < (filas * -1))
     return df
-
-
-def read_data_xls(file):
-    df = pd.read_excel(file)
-    return df
-
 
 def clasificar(simbolo):
     if simbolo in ['BBAR', 'BMA', 'VALO', 'SUPV', 'GGAL']:
@@ -69,6 +72,8 @@ def convertir_rava(df):
     df['APERTURA'] = df['APERTURA'].astype(float)
     df['RESULTADO'] = df['CIERRE'] - df['APERTURA']
     df['PORCENTAJE'] = ((df['CIERRE'] - df['APERTURA']) / df['APERTURA'])
+    df['TOMORROW'] = df['CIERRE']-df['CIERRE'].shift(-1)
+    df['TARGET'] = (df['TOMORROW'] > 0).astype(int)
     return df
 
 
@@ -78,14 +83,11 @@ def convertir(df):
     df['APERTURA'] = df['APERTURA'].str.replace(',', '.').astype(float)
     df['MAXIMO'] = df['MAXIMO'].str.replace(',', '.').astype(float)
     df['MINIMO'] = df['MINIMO'].str.replace(',', '.').astype(float)
-    # df['PRECIO PROMEDIO'] = df['PRECIO PROMEDIO'].str.replace(',', '.').astype(float)
-    # df['CANTIDAD DE OPERACIONES'] = df['CANTIDAD DE OPERACIONES'].astype(int)
-    # df['VOLUMEN NOMINAL'] = df['VOLUMEN NOMINAL'].str.replace(',', '.').astype(float)
-    # df['MONTO NEGOCIADO'] = df['MONTO NEGOCIADO'].str.replace(',', '.').astype(float)
     df['RESULTADO'] = df['CIERRE'] - df['APERTURA']
     df['PORCENTAJE'] = ((df['CIERRE'] - df['APERTURA']) / df['APERTURA'])
     # df['RES_PESADO'] = df['RESULTADO'] * df['MONTO NEGOCIADO']
     df['CLASE'] = df['SIMBOLO'].apply(clasificar)
+    df['TOMORROW'] = df['CIERRE']-df['CIERRE'].shift(-1)
     return df
 
 
@@ -113,19 +115,6 @@ def normalizar(df):
     # norma_key(df_ret, 'BULLISH', 0)
     # norma_key(df_ret, 'BEARISH', 0)
     return df_ret
-
-
-def normalizar2(df):
-    df_ret = pd.DataFrame(df)
-    norma_key(df_ret, 'CIERRE', 1)
-    norma_key(df_ret, 'APERTURA', 1)
-    norma_key(df_ret, 'MAXIMO', 1)
-    norma_key(df_ret, 'MINIMO', 1)
-    # norma_key(df_ret, 'PRECIO PROMEDIO', 1)
-    # norma_key(df_ret, 'VOLUMEN NOMINAL', 1)
-    # norma_key(df_ret, 'MONTO NEGOCIADO', 1)
-    return df_ret
-
 
 def newBullishBearish(df):
     df_ret = pd.DataFrame(df)
