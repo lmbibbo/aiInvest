@@ -11,7 +11,7 @@ def load_especie(especie):
     fecha_inicio_yyyymmdd = fecha_inicio.strftime('%Y-%m-%d')
 
     data = {
-        "access_token": "93c25fdc3a3ec6647db4169f0d8fe36badbdd656" }
+        "access_token": "d3d0d01349012125cc3d78919a60c04c684ac388" }
 
     data["especie"] = especie
     data["fecha_inicio"] = fecha_inicio_yyyymmdd
@@ -67,13 +67,21 @@ def clasificar(simbolo):
 
 def convertir_rava(df):
     df.columns = df.columns.str.upper()
+    #df.drop(['VARMTD', 'VARYTD', 'VAR6M', 'VAR12M', 'HORA', 'TIMESTAMP'], axis=1)
     df['FECHA'] = pd.to_datetime(df['FECHA'], format='%Y-%m-%d')
     df['CIERRE'] = df['CIERRE'].astype(float)
     df['APERTURA'] = df['APERTURA'].astype(float)
     df['RESULTADO'] = df['CIERRE'] - df['APERTURA']
     df['PORCENTAJE'] = ((df['CIERRE'] - df['APERTURA']) / df['APERTURA'])
-    df['TOMORROW'] = df['CIERRE']-df['CIERRE'].shift(-1)
-    df['TARGET'] = (df['TOMORROW'] > 0).astype(int)
+    df['CIERRE1'] = df['CIERRE'].shift(-1)
+    df['CIERRE3'] = df['CIERRE'].shift(-3)
+    df['CIERRE5'] = df['CIERRE'].shift(-5)
+    df['CIERRE9'] = df['CIERRE'].shift(-9)
+    df['TARGET1'] = (df['CIERRE1'] > df['CIERRE']).astype(int)
+    df['TARGET3'] = (df['CIERRE3'] > df['CIERRE1']).astype(int)
+    df['TARGET5'] = (df['CIERRE5'] > df['CIERRE3']).astype(int)
+    df['TARGET9'] = (df['CIERRE9'] > df['CIERRE5']).astype(int)
+    df.dropna()
     return df
 
 
