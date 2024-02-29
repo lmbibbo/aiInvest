@@ -3,16 +3,15 @@ import numpy as np
 import requests
 from datetime import datetime, timedelta
 
-def load_especie(especie):
+def load_especie(especie, access_token):
     url = 'https://clasico.rava.com/lib/restapi/v3/publico/cotizaciones/historicos'
     fecha_fin = datetime.today().date()
     fecha_inicio = fecha_fin - timedelta(days=500)
     fecha_fin_yyyymmdd = fecha_fin.strftime('%Y-%m-%d')
     fecha_inicio_yyyymmdd = fecha_inicio.strftime('%Y-%m-%d')
 
-    data = {
-        "access_token": "d3d0d01349012125cc3d78919a60c04c684ac388" }
-
+    data = {}
+    data["access_token"] = access_token
     data["especie"] = especie
     data["fecha_inicio"] = fecha_inicio_yyyymmdd
     data["fecha_fin"] = fecha_fin_yyyymmdd
