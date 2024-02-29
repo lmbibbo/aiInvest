@@ -18,14 +18,13 @@ def load_especie(especie, access_token):
     response = requests.post(url, data=data)
     if response.status_code == 200:
         # Guardar el contenido de la respuesta en un archivo
-        with open('data/archivo_descargado.csv', "wb") as f:
-            data_json = response.json()
-            body = data_json.get('body', None)
-            if body:
-                df = pd.DataFrame(body)
-                df = convertir_rava(df)
-            else:
-                print("Error: No se encuentra el body del archivo.")
+        data_json = response.json()
+        body = data_json.get('body', None)
+        if body:
+            df = pd.DataFrame(body)
+            df = convertir_rava(df)
+        else:
+            print("Error: No se encuentra el body del archivo.")
         print("Archivo descargado exitosamente.")
     else:
         print("Error al descargar el archivo:", response.status_code)
